@@ -49,7 +49,7 @@ int main(int args, char** argv) {
             return 1;
         }
 
-		// 通过请求中的UA，可以解析出用户使用设备的操作系统是windows的
+		// 通过请求中的UA，可以解析出用户使用设备的操作系统是 iOS 的
 		assert(SA_OK == sa_add_string("$os", "iOS", strlen("iOS"), properties)); 
 		// 操作系统的具体版本
 		assert(SA_OK == sa_add_string("$os_version", "10.0.0", strlen("10.0.0"), properties));
@@ -89,7 +89,7 @@ int main(int args, char** argv) {
             return 1;
         }
        
-        // 通过请求中的UA，可以解析出用户使用设备的操作系统是windows的
+        // 通过请求中的UA，可以解析出用户使用设备的操作系统是 iOS 的
 		assert(SA_OK == sa_add_string("$os", "iOS", strlen("iOS"), properties)); 
 		// 操作系统的具体版本
 		assert(SA_OK == sa_add_string("$os_version", "10.0.0", strlen("10.0.0"), properties));
@@ -112,7 +112,7 @@ int main(int args, char** argv) {
             return 1;
         }
        
-        // 通过请求中的UA，可以解析出用户使用设备的操作系统是windows的
+        // 通过请求中的UA，可以解析出用户使用设备的操作系统是 iOS 的
 		assert(SA_OK == sa_add_string("$os", "iOS", strlen("iOS"), properties)); 
 		// 操作系统的具体版本
 		assert(SA_OK == sa_add_string("$os_version", "10.0.0", strlen("10.0.0"), properties));
@@ -126,7 +126,7 @@ int main(int args, char** argv) {
         // 商品价格
         assert(SA_OK == sa_add_number("product_price", 5888, properties));
 
-        // 记录搜索商品事件
+        // 记录浏览商品事件
         assert(SA_OK == sa_track(cookie_id, "ViewProduct", properties, sa));
 
         sa_free_properties(properties);
@@ -231,7 +231,7 @@ int main(int args, char** argv) {
         // 用户获得头衔
         assert(SA_OK == sa_append_list("title", "VIP", 3, properties));
 
-        // 记录搜索商品事件
+        // 添加用户属性
         assert(SA_OK == sa_profile_append(login_id, properties, sa));
 
         sa_free_properties(properties);
