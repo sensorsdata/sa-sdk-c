@@ -1116,7 +1116,7 @@ static int _sa_assert_key_name(const char* key, pcre** regex) {
 #else
 static int _sa_assert_key_name(const char* key) {
 #endif
-  unsigned long key_len = (NULL == key ? -1 : strlen(key));
+  unsigned long key_len = (NULL == key ? (unsigned long)-1 : strlen(key));
   if (key_len < 1 || key_len > 255) {
     return SA_INVALID_PARAMETER_ERROR;
   }
@@ -1163,7 +1163,7 @@ static int _sa_track_event(
   int res = SA_OK;
 
   // 合法性检查.
-  unsigned long distinct_id_len = (NULL == distinct_id ? -1 : strlen(distinct_id));
+  unsigned long distinct_id_len = (NULL == distinct_id ? (unsigned long)-1 : strlen(distinct_id));
   if (distinct_id_len < 1 || distinct_id_len > 255) {
     fprintf(
       stderr,
@@ -1172,7 +1172,7 @@ static int _sa_track_event(
     return SA_INVALID_PARAMETER_ERROR;
   }
   if (_sa_is_track_signup(type)) {
-    unsigned long origin_id_len = (NULL == origin_id ? -1 : strlen(origin_id));
+    unsigned long origin_id_len = (NULL == origin_id ? (unsigned long)-1 : strlen(origin_id));
     if (origin_id_len < 1 || origin_id_len > 255) {
       fprintf(
         stderr,
