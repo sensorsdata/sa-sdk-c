@@ -6,21 +6,31 @@
 #ifndef SENSORS_ANALYTICS_CORE_H
 #define SENSORS_ANALYTICS_CORE_H
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+#define SA_ASSERT(condition) do { \
+  bool cond = (condition); \
+  if (!cond) { \
+    printf("condition:%d\n", cond); \
+    abort(); \
+  } \
+} while (0)
 
 // the last '.' is for resolving the cn's compiling error on windows platform
 // SDK 错误码.
 typedef enum {
-    SA_OK,
-    SA_MALLOC_ERROR,
-    SA_INVALID_PARAMETER_ERROR,
-    SA_IO_ERROR
+  SA_OK,
+  SA_MALLOC_ERROR,
+  SA_INVALID_PARAMETER_ERROR,
+  SA_IO_ERROR
 } SAErrCode;
 
 typedef enum {
-    SA_FALSE,
-    SA_TRUE
+  SA_FALSE,
+  SA_TRUE
 } SABool;
 
 // ----------------------------------------------------------------------------
@@ -31,15 +41,15 @@ typedef int (*sa_consumer_flush)(void* this_);
 typedef int (*sa_consumer_close)(void* this_);
 
 struct SAConsumerOp {
-    sa_consumer_send send;
-    sa_consumer_flush flush;
-    sa_consumer_close close;
+  sa_consumer_send send;
+  sa_consumer_flush flush;
+  sa_consumer_close close;
 };
 
 struct SAConsumer {
-    struct SAConsumerOp op;
-    // Consumer 私有数据.
-    void* this_;
+  struct SAConsumerOp op;
+  // Consumer 私有数据.
+  void* this_;
 };
 
 // LoggingConsumer 用于将事件以日志文件的形式记录在本地磁盘中.
@@ -189,7 +199,7 @@ int sa_clear_super_properties(struct SensorsAnalytics* sa);
 //
 // @return SA_OK 追踪成功，否则追踪失败.
 #define sa_track(distinct_id, event, properties, sa)      \
-    _sa_track(distinct_id, event, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_track(distinct_id, event, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_track(
         const char* distinct_id,
         const char* event,
@@ -213,7 +223,7 @@ int _sa_track(
 //
 // @return SA_OK 追踪关联事件成功，否则失败.
 #define sa_track_signup(distinct_id, origin_id, properties, sa)   \
-    _sa_track_signup(distinct_id, origin_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_track_signup(distinct_id, origin_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_track_signup(
         const char* distinct_id,
         const char* origin_id,
@@ -231,7 +241,7 @@ int _sa_track_signup(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_set(distinct_id, properties, sa)   \
-    _sa_profile_set(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_set(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_set(
         const char* distinct_id,
         const SAProperties* properties,
@@ -248,7 +258,7 @@ int _sa_profile_set(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_set_once(distinct_id, properties, sa)   \
-    _sa_profile_set_once(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_set_once(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_set_once(
         const char* distinct_id,
         const SAProperties* properties,
@@ -265,7 +275,7 @@ int _sa_profile_set_once(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_increment(distinct_id, properties, sa)   \
-    _sa_profile_increment(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_increment(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_increment(
         const char* distinct_id,
         const SAProperties* properties,
@@ -282,7 +292,7 @@ int _sa_profile_increment(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_append(distinct_id, properties, sa)   \
-    _sa_profile_append(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_append(distinct_id, properties, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_append(
         const char* distinct_id,
         const SAProperties* properties,
@@ -299,7 +309,7 @@ int _sa_profile_append(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_unset(distinct_id, key, sa)   \
-    _sa_profile_unset(distinct_id, key, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_unset(distinct_id, key, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_unset(
         const char* distinct_id,
         const char* key,
@@ -315,7 +325,7 @@ int _sa_profile_unset(
 //
 // @return SA_OK 设置成功，否则失败.
 #define sa_profile_delete(distinct_id, sa)   \
-    _sa_profile_delete(distinct_id, __FILE__, __FUNCTION__, __LINE__, sa)
+  _sa_profile_delete(distinct_id, __FILE__, __FUNCTION__, __LINE__, sa)
 int _sa_profile_delete(
         const char* distinct_id,
         const char* __file__,

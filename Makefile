@@ -19,5 +19,4 @@ clean:
 	rm -rf *.o *.a
 	rm -rf output
 	rm -rf demo
-
-	
+	rm -rf demo.out.log.*
