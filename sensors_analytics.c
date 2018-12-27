@@ -891,9 +891,11 @@ static int _sa_get_current_date() {
 }
 
 static int _sa_logging_consumer_flush(void* this_) {
-  // DO NOTHING
-  (void)(this_);
-  return SA_OK;
+  SALoggingConsumerInter* inter = (SALoggingConsumerInter*)this_;
+  if (NULL != inter->file && 0 == fflush(inter->file)) {
+    return SA_OK;
+  }
+  return SA_IO_ERROR;
 }
 
 static int _sa_logging_consumer_close(void* this_) {
