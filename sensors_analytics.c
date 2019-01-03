@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #elif defined(_WIN32)
 #include <windows.h>
+#include <sys/timeb.h>
 #include "pcre/pcre.h"
 #endif
 
@@ -158,7 +159,7 @@ typedef struct SANode {
   union {
     int bool_;
     double number_;
-    long int_;
+    long long int_;
     struct {
       time_t seconds;
       int microseconds;
@@ -213,7 +214,7 @@ static struct SANode* _sa_init_number_node(const char* key, double number_) {
   return node;
 }
 
-static struct SANode* _sa_init_int_node(const char* key, long int_) {
+static struct SANode* _sa_init_int_node(const char* key, long long int_) {
   struct SANode* node = _sa_malloc_node(SA_INT, key);
   if (NULL == node) {
     return NULL;
@@ -696,11 +697,11 @@ int _sa_dump_node(const struct SANode* node, SAStringBuffer* sb) {
     }
     break;
   case SA_NUMBER:
-    snprintf(buf, 64, "%.6g", node->number_);
+    snprintf(buf, 64, "%.3g", node->number_);
     _sa_sb_put(sb, buf, strlen(buf));
     break;
   case SA_INT:
-    snprintf(buf, 64, "%ld", node->int_);
+    snprintf(buf, 64, "%lld", node->int_);
     _sa_sb_put(sb, buf, strlen(buf));
     break;
   case SA_DATE:
@@ -779,7 +780,7 @@ int sa_add_number(const char* key, double number_, SAProperties* properties) {
   return SA_OK;
 }
 
-int sa_add_int(const char* key, long int_, SAProperties* properties) {
+int sa_add_int(const char* key, long long int_, SAProperties* properties) {
   if (NULL == properties) {
     fprintf(stderr, "Parameter 'properties' is NULL.");
     return SA_INVALID_PARAMETER_ERROR;
@@ -1152,18 +1153,13 @@ static int _sa_is_track_signup(const char* type) {
   return 0 == strncmp(type, "track_signup", strlen("track_signup"));
 }
 
-static int _sa_track_event(
+static int _sa_check_legality(
   const char* distinct_id,
   const char* origin_id,
   const char* type,
   const char* event,
   const struct SANode* properties,
-  const char* __file__,
-  const char* __function__,
-  unsigned long __line__,
   SensorsAnalytics* sa) {
-  int res = SA_OK;
-
   // 合法性检查.
   unsigned long distinct_id_len = (NULL == distinct_id ? (unsigned long)-1 : strlen(distinct_id));
   if (distinct_id_len < 1 || distinct_id_len > 255) {
@@ -1213,6 +1209,25 @@ static int _sa_track_event(
       curr = curr->next;
     }
   }
+  return SA_OK;
+}
+
+static int _sa_track_internal(
+  const char* distinct_id,
+  const char* origin_id,
+  const char* type,
+  const char* event,
+  const struct SANode* properties,
+  const char* __file__,
+  const char* __function__,
+  unsigned long __line__,
+  SensorsAnalytics* sa) {
+  int res = SA_OK;
+
+  // 合法性检查.
+  if (SA_OK != (res = _sa_check_legality(distinct_id, origin_id, type, event, properties, sa))) {
+    return res;
+  }
 
   // msg 记录一个事件，例如: {"type" : "track", "event" : "AppStart", "distinct_id" : "12345", "properties" : { ... }, ...}
   SANode* msg = _sa_init_dict_node(NULL);
@@ -1241,17 +1256,18 @@ static int _sa_track_event(
 #if defined(USE_POSIX)
   struct timeval now;
   gettimeofday(&now, NULL);
-  if (SA_OK != (res = sa_add_int("time", (long)now.tv_sec * 1000 + (long)(now.tv_usec / 1000), msg))) {
+  if (SA_OK != (res = sa_add_int("time", (long long)now.tv_sec * 1000 + now.tv_usec / 1000, msg))) {
     return res;
   }
 #elif defined(_WIN32)
-  DWORD now = GetTickCount();
-  if (SA_OK != (res = sa_add_int("time", (long)now, msg))) {
+  struct timeb now;
+  ftime(&now);
+  if (SA_OK != (res = sa_add_int("time", (long long)now.time * 1000 + now.millitm, msg))) {
     return res;
   }
 #else
   time_t now = time(NULL);
-  if (SA_OK != (res = sa_add_int("time", (long)now * 1000, msg))) {
+  if (SA_OK != (res = sa_add_int("time", (long long)now * 1000, msg))) {
     return res;
   }
 #endif
@@ -1277,11 +1293,11 @@ static int _sa_track_event(
     return SA_MALLOC_ERROR;
   }
 
-  // 属性中加入 $lib 和 $lib_version.
-  sa_add_string("$lib", SA_LIB, strlen(SA_LIB), inner_properties);
-  sa_add_string("$lib_version", SA_LIB_VERSION, strlen(SA_LIB_VERSION), inner_properties);
-
   if (_sa_is_track(type) || _sa_is_track_signup(type)) {
+    // 属性中加入 $lib 和 $lib_version.
+    sa_add_string("$lib", SA_LIB, strlen(SA_LIB), inner_properties);
+    sa_add_string("$lib_version", SA_LIB_VERSION, strlen(SA_LIB_VERSION), inner_properties);
+
 #if defined(USE_POSIX)
     pthread_mutex_lock(&sa->mutex);
 #elif defined(_WIN32)
@@ -1356,15 +1372,15 @@ int _sa_track(
         const char* __function__,
         unsigned long __line__,
         SensorsAnalytics* sa) {
-  return _sa_track_event(distinct_id,
-                         NULL,
-                         "track",
-                         event,
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            NULL,
+                            "track",
+                            event,
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_track_signup(
@@ -1375,15 +1391,15 @@ int _sa_track_signup(
         const char* __function__,
         unsigned long __line__,
         SensorsAnalytics* sa) {
-  return _sa_track_event(distinct_id,
-                         origin_id,
-                         "track_signup",
-                         "$SignUp",
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            origin_id,
+                            "track_signup",
+                            "$SignUp",
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_profile_set(
@@ -1396,15 +1412,15 @@ int _sa_profile_set(
   if (NULL == properties) {
     return SA_INVALID_PARAMETER_ERROR;
   }
-  return _sa_track_event(distinct_id,
-                         NULL,
-                         "profile_set",
-                         NULL,
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            NULL,
+                            "profile_set",
+                            NULL,
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_profile_set_once(
@@ -1417,15 +1433,15 @@ int _sa_profile_set_once(
   if (NULL == properties) {
     return SA_INVALID_PARAMETER_ERROR;
   }
-  return _sa_track_event(distinct_id,
-                         NULL,
-                         "profile_set_once",
-                         NULL,
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            NULL,
+                            "profile_set_once",
+                            NULL,
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_profile_increment(
@@ -1438,15 +1454,15 @@ int _sa_profile_increment(
   if (NULL == properties) {
     return SA_INVALID_PARAMETER_ERROR;
   }
-  return _sa_track_event(distinct_id,
-                         NULL,
-                         "profile_increment",
-                         NULL,
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            NULL,
+                            "profile_increment",
+                            NULL,
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_profile_append(
@@ -1459,15 +1475,15 @@ int _sa_profile_append(
   if (NULL == properties) {
     return SA_INVALID_PARAMETER_ERROR;
   }
-  return _sa_track_event(distinct_id,
-                         NULL,
-                         "profile_append",
-                         NULL,
-                         properties,
-                         __file__,
-                         __function__,
-                         __line__,
-                         sa);
+  return _sa_track_internal(distinct_id,
+                            NULL,
+                            "profile_append",
+                            NULL,
+                            properties,
+                            __file__,
+                            __function__,
+                            __line__,
+                            sa);
 }
 
 int _sa_profile_unset(
@@ -1486,15 +1502,15 @@ int _sa_profile_unset(
 
   sa_add_bool(key, SA_TRUE, properties);
 
-  res = _sa_track_event(distinct_id,
-                        NULL,
-                        "profile_unset",
-                        NULL,
-                        properties,
-                        __file__,
-                        __function__,
-                        __line__,
-                        sa);
+  res = _sa_track_internal(distinct_id,
+                           NULL,
+                           "profile_unset",
+                           NULL,
+                           properties,
+                           __file__,
+                           __function__,
+                           __line__,
+                           sa);
 
   sa_free_properties(properties);
 
@@ -1514,15 +1530,15 @@ int _sa_profile_delete(
     return SA_MALLOC_ERROR;
   }
 
-  res = _sa_track_event(distinct_id,
-                        NULL,
-                        "profile_delete",
-                        NULL,
-                        properties,
-                        __file__,
-                        __function__,
-                        __line__,
-                        sa);
+  res = _sa_track_internal(distinct_id,
+                           NULL,
+                           "profile_delete",
+                           NULL,
+                           properties,
+                           __file__,
+                           __function__,
+                           __line__,
+                           sa);
 
   sa_free_properties(properties);
 

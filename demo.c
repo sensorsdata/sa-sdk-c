@@ -12,7 +12,7 @@ int main(int args, char** argv) {
   (void)(argv);
 
   SALoggingConsumer* consumer = NULL;
-  if (SA_OK != sa_init_logging_consumer("./demo.out", &consumer)) {
+  if (SA_OK != sa_init_logging_consumer("demo.out", &consumer)) {
     fprintf(stderr, "Failed to initialize the consumer.");
     return 1;
   }
