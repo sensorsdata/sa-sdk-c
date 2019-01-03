@@ -697,7 +697,7 @@ int _sa_dump_node(const struct SANode* node, SAStringBuffer* sb) {
     }
     break;
   case SA_NUMBER:
-    snprintf(buf, 64, "%.6g", node->number_);
+    snprintf(buf, 64, "%.3g", node->number_);
     _sa_sb_put(sb, buf, strlen(buf));
     break;
   case SA_INT:
