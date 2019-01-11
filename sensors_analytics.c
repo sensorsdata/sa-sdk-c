@@ -23,7 +23,7 @@
 #define SA_LIB_METHOD "code"
 
 #define KEY_WORD_PATTERN "(^distinct_id$|^original_id$|^time$|^properties$|^id$|^first_id$|^second_id$|^users$|^events$|^event$|^user_id$|^date$|^datetime$)"
-#define NAME_PATTERN "^[a-zA-Z_$][a-zA-Z\\d_$]{0,99}$"
+#define NAME_PATTERN "^[a-zA-Z_$][a-zA-Z0-9_$]{0,99}$"
 
 #if defined(__linux__)
 #define LOCALTIME(seconds, now) localtime_r((seconds), (now))
