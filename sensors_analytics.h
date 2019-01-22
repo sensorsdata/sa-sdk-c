@@ -144,6 +144,15 @@ int sa_add_bool(const char* key, SABool bool_, SAProperties* properties);
 // @return SA_OK 添加成功，否则失败.
 int sa_add_number(const char* key, double number_, SAProperties* properties);
 
+// 向事件属性或用户属性添加 long integer 类型的属性
+//
+// @param key<in>           属性名称
+// @param number_<in>       属性值
+// @param properties<out>   SAProperties 对象
+//
+// @return SA_OK 添加成功，否则失败.
+int sa_add_int(const char* key, long long int_, SAProperties* properties);
+
 // 向事件属性或用户属性添加 Date 类型的属性
 //
 // @param key<in>           属性名称

@@ -189,7 +189,9 @@ int main(int args, char** argv) {
     // 商品名称.
     SA_ASSERT(SA_OK == sa_add_string("product_name", "XX手机", 8, properties));
     // 商品价格.
-    SA_ASSERT(SA_OK == sa_add_number("product_price", 5888, properties));
+    SA_ASSERT(SA_OK == sa_add_int("product_price", 5888, properties));
+    // 商品折扣.
+    SA_ASSERT(SA_OK == sa_add_number("product_discount", 0.8, properties));
 
     // 记录购买商品事件.
     SA_ASSERT(SA_OK == sa_track(cookie_id, "SubmitOrder", properties, sa));
