@@ -192,9 +192,12 @@ int main(int args, char** argv) {
     SA_ASSERT(SA_OK == sa_add_int("product_price", 5888, properties));
     // 商品折扣.
     SA_ASSERT(SA_OK == sa_add_number("product_discount", 0.8, properties));
+    // 记录外部项目名称
+    SA_ASSERT(SA_OK == sa_add_string("$project", "MyOrder", strlen("MyOrder"), properties));
 
     // 记录购买商品事件.
     SA_ASSERT(SA_OK == sa_track(cookie_id, "SubmitOrder", properties, sa));
+
 
     sa_free_properties(properties);
   }

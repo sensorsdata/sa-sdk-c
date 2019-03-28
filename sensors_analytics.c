@@ -1331,6 +1331,18 @@ static int _sa_track_internal(
             return res;
           }
         }
+      } else if (NULL != curr->value->key && 0 == strncmp("$project", curr->value->key, 256)) {
+        // 若属性中包含 "$project" 对象，则将其改写为project属性
+        SANode* project_node = _sa_get_child("$project", properties);
+        if (NULL != project_node) {
+          if (SA_OK != (res = sa_add_string(
+                "project",
+                project_node->string_,
+                strlen(project_node->string_),
+                msg))) {
+            return res;
+          }
+        }
       } else {
         _sa_add_child(curr->value, inner_properties);
       }
