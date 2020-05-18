@@ -1,6 +1,6 @@
 ![logo](https://opensource.sensorsdata.cn/wp-content/uploads/logo.png)
 <br><br>
-[![License](https://img.shields.io/github/license/sensorsdata/sa-sdk-c.svg)](https://github.com/sensorsdata/sa-sdk-c/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/sensorsdata/sa-sdk-cpp.svg)](https://github.com/sensorsdata/sa-sdk-c/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/tag/sensorsdata/sa-sdk-c.svg?label=release)](https://github.com/sensorsdata/sa-sdk-c/releases)
 [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/sa-sdk-c.svg)](https://github.com/sensorsdata/sa-sdk-c/releases)
 
@@ -20,6 +20,14 @@ SDK 符合 ANSI C99 规范，部分功能依赖 POSIX 库，不依赖第三方�
 ## 集成文档
 
 请参考神策官网 [C SDK 集成文档](https://manual.sensorsdata.cn/sa/latest/page-1573922.html)。
+
+## 贡献
+
+* 1.  在您的 GitHub 账户下 fork sa-sdk-c 开源项目；
+* 2.  根据您的需求在本地 clone 一份 sa-sdk-c 源码；
+* 3.  您修改或者新增功能后，push 到您 fork 的远程分支；
+* 4.  创建 pull request，向 sa-sdk-c 官方开发分支提交合入请求；
+* 5.  神策 SDK 研发团队会及时 review 代码，测试通过后合入。
 
 ## 版本更新记录
 
