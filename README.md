@@ -1,6 +1,6 @@
 ![logo](https://opensource.sensorsdata.cn/wp-content/uploads/logo.png)
 <br><br>
-[![License](https://img.shields.io/github/license/sensorsdata/sa-sdk-ios.svg)](https://github.com/sensorsdata/sa-sdk-ios/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/sensorsdata/sa-sdk-c.svg)](https://github.com/sensorsdata/sa-sdk-c/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/tag/sensorsdata/sa-sdk-c.svg?label=release)](https://github.com/sensorsdata/sa-sdk-c/releases)
 [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/sa-sdk-c.svg)](ttps://github.com/sensorsdata/sa-sdk-c/releases)
 
