@@ -14,11 +14,13 @@
 #include <windows.h>
 #include <sys/timeb.h>
 #include "pcre/pcre.h"
+#elif defined(__linux__)
+#include <sys/time.h>
 #endif
 
 #include "sensors_analytics.h"
 
-#define SA_LIB_VERSION "0.1.0"
+#define SA_LIB_VERSION "0.1.1"
 #define SA_LIB "C"
 #define SA_LIB_METHOD "code"
 
@@ -1265,6 +1267,12 @@ static int _sa_track_internal(
   if (SA_OK != (res = sa_add_int("time", (long long)now.time * 1000 + now.millitm, msg))) {
     return res;
   }
+#elif defined(__linux__)
+  struct timespec now;
+  clock_gettime(CLOCK_REALTIME, &now);
+  if (SA_OK != (res = sa_add_int("time", (long long)now.tv_sec * 1000 + now.tv_nsec / 1000000, msg))) {
+    return res;
+  }
 #else
   time_t now = time(NULL);
   if (SA_OK != (res = sa_add_int("time", (long long)now * 1000, msg))) {
@@ -1332,7 +1340,7 @@ static int _sa_track_internal(
           }
         }
       } else if (NULL != curr->value->key && 0 == strncmp("$project", curr->value->key, 256)) {
-        // 若属性中包含 "$project" 对象，则将其改写为project属性
+        // 若属性中包含 "$project" 对象，则将其改写为 project 属性.
         SANode* project_node = _sa_get_child("$project", properties);
         if (NULL != project_node) {
           if (SA_OK != (res = sa_add_string(
