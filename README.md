@@ -54,7 +54,7 @@ SDK 符合 ANSI C99 规范，部分功能依赖 POSIX 库，不依赖第三方�
 
 ## License
 
-Copyright 2015－2020 Sensors Data Inc.
+Copyright 2015－2021 Sensors Data Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
