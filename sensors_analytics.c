@@ -13,6 +13,7 @@
 #elif defined(_WIN32)
 #include <windows.h>
 #include <sys/timeb.h>
+#include <share.h>
 #include "pcre/pcre.h"
 #elif defined(__linux__)
 #include <sys/time.h>
@@ -20,7 +21,7 @@
 
 #include "sensors_analytics.h"
 
-#define SA_LIB_VERSION "0.1.1"
+#define SA_LIB_VERSION "0.2.0"
 #define SA_LIB "C"
 #define SA_LIB_METHOD "code"
 
@@ -42,10 +43,7 @@
 #elif defined(_WIN32)
 #define LOCALTIME(seconds, now) localtime_s((now), (seconds))
 #define FOPEN(file, filename, option) do { \
-  errno_t err = fopen_s((file), (filename), (option)); \
-  if (0 != err) { \
-    *(file) = NULL; \
-  } \
+  *(file) = _fsopen((filename), (option), _SH_DENYNO); \
 } while (0)
 
 #endif
