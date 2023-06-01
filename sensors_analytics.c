@@ -21,7 +21,7 @@
 
 #include "sensors_analytics.h"
 
-#define SA_LIB_VERSION "0.2.0"
+#define SA_LIB_VERSION "0.2.1"
 #define SA_LIB "C"
 #define SA_LIB_METHOD "code"
 
@@ -1046,6 +1046,8 @@ void sa_free(SensorsAnalytics* sa) {
 #endif
 
   sa->consumer->op.close(sa->consumer->this_);
+  free(sa->consumer->this_);
+  free(sa->consumer);
 
   free(sa);
 }
